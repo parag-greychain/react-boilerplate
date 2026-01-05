@@ -6,7 +6,6 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
-import "./App.css";
 import { Login, Home } from "./pages";
 import { PATHS } from "./shared";
 
@@ -36,12 +35,7 @@ const App = () => {
       />
 
       <Suspense
-        fallback={
-          <div className="d-flex d-flex-middle d-flex-center h-full">
-            Loading...
-          </div>
-        }
-      >
+        fallback={<div className="d-flex d-flex-middle d-flex-center h-full">Loading...</div>}>
         <RouterProvider router={router} />
       </Suspense>
     </>

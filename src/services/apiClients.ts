@@ -1,22 +1,7 @@
-import axios, {
-  AxiosRequestConfig,
-  AxiosError,
-  AxiosInstance,
-  AxiosResponse,
-} from "axios";
+import axios, { AxiosRequestConfig, AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import persistStore from "redux-persist/es/persistStore";
 import { configs, LocalStorageName, STRING } from "../shared";
 import { store } from "../store";
-
-export const getSubdomain = (): string | null => {
-  const hostname = window.location.hostname || "";
-  const subdomain = hostname?.split(".")[0];
-
-  if (subdomain === "localhost") return "gc";
-  else return subdomain;
-};
-
-// Global flags and queue
 
 let isRefreshing = false;
 // let isLoggingOut = false;
@@ -37,9 +22,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 };
 
 const refreshAccessToken = async (): Promise<string> => {
-  const storedRefreshToken = localStorage.getItem(
-    LocalStorageName.RefreshToken
-  );
+  const storedRefreshToken = localStorage.getItem(LocalStorageName.RefreshToken);
   if (!storedRefreshToken) {
     throw new Error("No refresh token available");
   }
@@ -52,7 +35,6 @@ const refreshAccessToken = async (): Promise<string> => {
     {
       headers: {
         "Content-Type": "application/json",
-        Subdomain: getSubdomain(),
         Authorization: `Bearer ${storedRefreshToken}`,
       },
     }
@@ -64,8 +46,7 @@ const refreshAccessToken = async (): Promise<string> => {
 
   // Save new tokens
   localStorage.setItem(LocalStorageName.Token, accessToken);
-  if (refreshToken)
-    localStorage.setItem(LocalStorageName.RefreshToken, refreshToken);
+  if (refreshToken) localStorage.setItem(LocalStorageName.RefreshToken, refreshToken);
 
   return accessToken;
 };
@@ -76,7 +57,6 @@ export const axiosClient = axios.create({
   baseURL: configs.BASE_URL,
   headers: {
     "Content-Type": "application/json",
-    Subdomain: getSubdomain(),
   },
 });
 
@@ -118,9 +98,7 @@ const setupResponseInterceptor = (client: AxiosInstance) => {
         message?.includes(STRING?.errorMessage?.tokenExpireError)
       ) {
         originalRequest._retry = true;
-        const refreshToken = localStorage.getItem(
-          LocalStorageName.RefreshToken
-        );
+        const refreshToken = localStorage.getItem(LocalStorageName.RefreshToken);
 
         if (!refreshToken) {
           persistStore(store).purge();
@@ -172,43 +150,21 @@ const setupResponseInterceptor = (client: AxiosInstance) => {
 };
 
 applyRequestInterceptor(axiosClient);
-applyRequestInterceptor(axiosUserClient);
-
 setupResponseInterceptor(axiosClient);
-setupResponseInterceptor(axiosUserClient);
 
 // Methods GET, POST,PUT, DELETE for Axios-Client
 export const get = async (path: string, config?: AxiosRequestConfig) => {
-  return await axiosClient
-    .get(`${path}`, config)
-    .then((response) => response.data);
+  return await axiosClient.get(`${path}`, config).then((response) => response.data);
 };
 
-export const post = async (
-  path: string,
-  payload?: any,
-  config?: AxiosRequestConfig
-) => {
-  return await axiosClient
-    .post(`${path}`, payload, config)
-    .then((response) => response);
+export const post = async (path: string, payload?: any, config?: AxiosRequestConfig) => {
+  return await axiosClient.post(`${path}`, payload, config).then((response) => response);
 };
 
-export const put = async (
-  path: string,
-  payload?: any,
-  config?: AxiosRequestConfig
-) => {
-  return await axiosClient
-    .put(`${path}`, payload, config)
-    .then((response) => response);
+export const put = async (path: string, payload?: any, config?: AxiosRequestConfig) => {
+  return await axiosClient.put(`${path}`, payload, config).then((response) => response);
 };
 
-export const deleteRequest = async (
-  path: string,
-  config?: AxiosRequestConfig
-) => {
-  return await axiosClient
-    .delete(`${path}`, config)
-    .then((response) => response);
+export const deleteRequest = async (path: string, config?: AxiosRequestConfig) => {
+  return await axiosClient.delete(`${path}`, config).then((response) => response);
 };
